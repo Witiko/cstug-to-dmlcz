@@ -249,7 +249,6 @@ def write_pdf(filename: Path, pdf: PdfFileWriter):
 def main(input_xml: str, input_pdf: str, page_offset: int, first_page_number: int, output_dir: str):
     issue = JournalIssue(Path(input_xml), Path(input_pdf), page_offset, first_page_number)
     issue.write_xml(Path(output_dir))
-    print(issue)
 
 
 if __name__ == '__main__':
