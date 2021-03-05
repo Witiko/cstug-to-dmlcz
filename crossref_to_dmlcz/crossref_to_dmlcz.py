@@ -185,7 +185,7 @@ class JournalArticle:
                 title = get_text(title)
                 author,  = xpath(reference, 'crossref:author')
                 author = get_text(author)
-                suffix = '. {}. {}'.format(author, title)
+                suffix = ''
             reference = (refid, prefix, title, author, suffix)
             self.references.append(reference)
 
