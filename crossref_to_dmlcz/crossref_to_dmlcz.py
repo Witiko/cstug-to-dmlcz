@@ -60,9 +60,9 @@ class JournalArticle:
         self._load_references(journal_article)
 
     def write_xml(self, output_dir: Path):
-        self.__write_meta_xml(output_dir)
+        self._write_meta_xml(output_dir)
         if self.references:
-            self.__write_references_xml(output_dir)
+            self._write_references_xml(output_dir)
 
     def _write_meta_xml(self, output_dir: Path):
         article = etree.Element('article')
