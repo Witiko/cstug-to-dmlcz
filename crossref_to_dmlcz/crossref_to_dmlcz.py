@@ -91,15 +91,15 @@ class JournalArticle:
         language = etree.SubElement(article, 'language')
         language.text = self.language
 
+        if self.doi is not None:
+            doi = etree.SubElement(article, 'doi')
+            doi.text = self.doi
+
         category = etree.SubElement(article, 'category')
         category.text = self.category
 
         range_pages = etree.SubElement(article, 'range_pages')
         range_pages.text = '{}-{}'.format(*self.pages)
-
-        if self.doi is not None:
-            doi = etree.SubElement(article, 'doi')
-            doi.text = self.doi
 
         output_dir.mkdir(exist_ok=True)
         write_xml(output_dir / 'meta.xml', document)
