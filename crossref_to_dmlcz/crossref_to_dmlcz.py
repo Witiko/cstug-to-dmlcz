@@ -1,7 +1,6 @@
 from typing import Iterable
 from itertools import chain
 from pathlib import Path
-import re
 
 import click
 from lxml import etree
@@ -12,8 +11,6 @@ import pycountry
 NAMESPACES = {
     'crossref': 'http://www.crossref.org/schema/4.3.0',
 }
-OUTPUT_DIR_REGEX = r'(?P<journal_name>[^0-9]*)(?P<volume>[0-9]*)-(?P<year>[0-9]*)-(?P<issue>[-0-9]*)'
-OUTPUT_SUBDIR_FORMAT = '{volume:s}-{year:d}-{issue:s}'.format
 
 
 class JournalIssue:
@@ -30,28 +27,14 @@ class JournalIssue:
         self.articles = articles
 
     def write_xml(self, output_dir: Path):
-        match = re.fullmatch(OUTPUT_DIR_REGEX, output_dir.name)
-        if not match:
-            raise ValueError('Malformed output directory name {}'.format(output_dir.name))
-
-        journal_name = match.group('journal_name')
-        volume = match.group('volume')
-        year = match.group('year')
-        year = int(year)
-        issue = match.group('issue')
-
-        output_subdir = OUTPUT_SUBDIR_FORMAT(journal_name=journal_name, volume=volume, year=year, issue=issue)
-        output_subdir = output_dir / output_subdir
-
         output_dir.mkdir(exist_ok=True)
-        output_subdir.mkdir(exist_ok=True)
 
         input_pdf = read_pdf(self.input_pdf)
 
         for article_number, article in enumerate(self.articles):
             article_number += 1
             article_number = '#{}'.format(article_number)
-            article_directory = output_subdir / article_number
+            article_directory = output_dir / article_number
             article.write_xml(article_directory)
             article.write_pdf(article_directory, input_pdf, self.page_offset)
 
