@@ -14,9 +14,10 @@ NAMESPACES = {
 
 
 class JournalIssue:
-    def __init__(self, input_xml: Path, input_pdf: Path, page_offset: int):
+    def __init__(self, input_xml: Path, input_pdf: Path, page_offset: int, first_page_number: int):
         self.input_pdf = input_pdf
         self.page_offset = page_offset
+        self.first_page_number = first_page_number
 
         input_xml = read_xml(input_xml)
         journal, = xpath(input_xml, 'crossref:body/crossref:journal')
@@ -36,7 +37,7 @@ class JournalIssue:
             article_number = '#{}'.format(article_number)
             article_directory = output_dir / article_number
             article.write_xml(article_directory)
-            article.write_pdf(article_directory, input_pdf, self.page_offset)
+            article.write_pdf(article_directory, input_pdf, self.page_offset, self.first_page_number)
 
     def __repr__(self):
         return '\n'.join(
@@ -107,13 +108,13 @@ class JournalArticle:
         output_dir.mkdir(exist_ok=True)
         write_xml(output_dir / 'references.xml', document)
 
-    def write_pdf(self, output_dir: Path, input_pdf: PdfFileReader, page_offset: int):
+    def write_pdf(self, output_dir: Path, input_pdf: PdfFileReader, page_offset: int, first_page_number: int):
         output_pdf = PdfFileWriter()
 
         first_page, last_page = self.pages
         for page_number in range(first_page, last_page + 1):
             page_number += page_offset
-            page_number -= 1
+            page_number -= first_page_number
             page = input_pdf.getPage(page_number)
             output_pdf.addPage(page)
 
@@ -242,10 +243,11 @@ def write_pdf(filename: Path, pdf: PdfFileWriter):
 @click.command()
 @click.option('--input-xml', help='The input CrossRef XML.', type=click.Path(exists=True))
 @click.option('--input-pdf', help='The input PDF with an issue.', type=click.Path(exists=True))
-@click.option('--page-offset', default=0, help='The offset of PDF pages to CrossRef XML')
+@click.option('--page-offset', default=0, help='The offset between PDF\'s first physical and logical pages')
+@click.option('--first-page-number', default=1, help='The page name of the PDF\'s first logical page')
 @click.option('--output-dir', help='The output DML-CZ directory with an issue.', type=click.Path(dir_okay=True))
-def main(input_xml: str, input_pdf: str, page_offset: int, output_dir: str):
-    issue = JournalIssue(Path(input_xml), Path(input_pdf), page_offset)
+def main(input_xml: str, input_pdf: str, page_offset: int, first_page_number: int, output_dir: str):
+    issue = JournalIssue(Path(input_xml), Path(input_pdf), page_offset, first_page_number)
     issue.write_xml(Path(output_dir))
     print(issue)
 
