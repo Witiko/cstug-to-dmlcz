@@ -76,6 +76,11 @@ class JournalArticle:
         self._load_references(journal_article)
 
     def write_xml(self, output_dir: Path):
+        self.__write_meta_xml(output_dir)
+        if self.references:
+            self.__write_references_xml(output_dir)
+
+    def _write_meta_xml(self, output_dir: Path):
         article = etree.Element('article')
         document = etree.ElementTree(article)
 
@@ -103,6 +108,21 @@ class JournalArticle:
 
         output_dir.mkdir(exist_ok=True)
         write_xml(output_dir / 'meta.xml', document)
+
+    def __write_references_xml(self, output_dir: Path):
+        references = etree.Element('references')
+        document = etree.ElementTree(references)
+
+        for refid, prefix, title, author, suffix in self.references:
+            reference = etree.SubElement(references, 'reference', id=refid)
+            etree.SubElement(reference, 'prefix').text = prefix
+            etree.SubElement(reference, 'title').text = title
+            authors = etree.SubElement(reference, 'authors')
+            etree.SubElement(authors, 'author').text = author
+            etree.SubElement(reference, 'suffix').text = suffix
+
+        output_dir.mkdir(exist_ok=True)
+        write_xml(output_dir / 'references.xml', document)
 
     def write_pdf(self, output_dir: Path, input_pdf: PdfFileReader, page_offset: int):
         output_pdf = PdfFileWriter()
@@ -175,13 +195,13 @@ class JournalArticle:
                 doi = get_text(doi)
                 title = None
                 author = None
-                suffix = doi
+                suffix = '. DOI: {}'.format(doi)
             else:
                 title, = xpath(reference, 'crossref:article_title')
                 title = get_text(title)
                 author,  = xpath(reference, 'crossref:author')
                 author = get_text(author)
-                suffix = '{}. {}'.format(author, title)
+                suffix = '. {}. {}'.format(author, title)
             reference = (refid, prefix, title, author, suffix)
             self.references.append(reference)
 
