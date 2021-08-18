@@ -93,7 +93,7 @@ class JournalArticle:
         output_dir.mkdir(exist_ok=True)
         write_xml(output_dir / 'meta.xml', document)
 
-    def __write_references_xml(self, output_dir: Path):
+    def _write_references_xml(self, output_dir: Path):
         references = etree.Element('references')
         document = etree.ElementTree(references)
 
