@@ -35,4 +35,4 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: pip install .
       - run: pip install pytype
-      - run: pytype crossref_to_dmlcz
+      - run: pytype cstug_to_dmlcz

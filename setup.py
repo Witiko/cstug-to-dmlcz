@@ -4,17 +4,17 @@ from setuptools import setup
 
 
 setup(
-    name='crossref-to-dmlcz',
-    version='0.0.2',
+    name='cstug-to-dmlcz',
+    version='0.0.1',
     author='Vít Novotný',
     author_email='witiko@mail.muni.cz',
     license='GPLv3',
-    description='Converts CrossRef XML to DML-CZ XML',
-    packages=['crossref_to_dmlcz'],
-    package_dir={'crossref_to_dmlcz': 'crossref_to_dmlcz'},
+    description='Converts CSTUG XML to DML-CZ XML',
+    packages=['cstug_to_dmlcz'],
+    package_dir={'cstug_to_dmlcz': 'cstug_to_dmlcz'},
     entry_points={
         'console_scripts': [
-            'crossref-to-dmlcz=crossref_to_dmlcz.crossref_to_dmlcz:main',
+            'cstug-to-dmlcz=cstug_to_dmlcz.cstug_to_dmlcz:main',
         ],
     },
     setup_requires=[
