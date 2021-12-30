@@ -174,18 +174,28 @@ class JournalArticle:
             refid += 1
             prefix = '[{}]'.format(refid)
             dois = xpath(reference, 'crossref:doi')
+            article_titles = xpath(reference, 'crossref:article_title')
+            unstructured_citations = xpath(reference, 'crossref:unstructured_citation')
             if dois:
                 doi, = dois
                 doi = get_text(doi)
                 title = None
                 author = None
                 suffix = '. DOI: {}'.format(doi)
-            else:
-                title, = xpath(reference, 'crossref:article_title')
+            elif article_titles:
+                title, = article_titles
                 title = get_text(title)
                 author,  = xpath(reference, 'crossref:author')
                 author = get_text(author)
                 suffix = ''
+            elif unstructured_citations:
+                unstructured_citation, = unstructured_citations
+                title = None
+                author = None
+                suffix = get_text(unstructured_citation)
+            else:
+                message = 'Reference {} contains neither DOI, article title, or unstructured citation'
+                raise ValueError(message.format(refid))
             reference = (refid, prefix, title, author, suffix)
             self.references.append(reference)
 

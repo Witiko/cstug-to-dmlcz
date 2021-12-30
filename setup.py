@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='crossref-to-dmlcz',
-    version='0.0.1',
+    version='0.0.2',
     author='Vít Novotný',
     author_email='witiko@mail.muni.cz',
     license='GPLv3',
