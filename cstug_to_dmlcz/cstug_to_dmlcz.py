@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Tuple
 from itertools import chain
 from pathlib import Path
 import subprocess
@@ -140,7 +140,7 @@ class JournalArticle:
         references = etree.Element('references')
         document = etree.ElementTree(references)
 
-        for refid, prefix, title, author_names, suffix in self.references:
+        for refid, prefix, title, author_names, suffix, optionals in self.references:
             reference = etree.SubElement(references, 'reference', id=str(refid))
             etree.SubElement(reference, 'prefix').text = prefix
             etree.SubElement(reference, 'title').text = title
@@ -148,6 +148,8 @@ class JournalArticle:
             for first_name, last_name in author_names:
                 author = '{}, {}'.format(last_name, first_name) if first_name else last_name
                 etree.SubElement(authors, 'author').text = author
+            for optional_element_name, optional_element_text in sorted(optionals.items()):
+                etree.SubElement(reference, optional_element_name).text = optional_element_text
             etree.SubElement(reference, 'suffix').text = suffix
 
         output_dir.mkdir(exist_ok=True)
@@ -213,7 +215,7 @@ class JournalArticle:
 
     def _load_authors(self, journal_article: etree._Element):
         self.authors = []
-        for author_order, (first_name, last_name) in enumerate(get_author_names(reference)):
+        for author_order, (first_name, last_name) in enumerate(get_author_names(journal_article)):
             assert first_name
             author_order += 1
             name = (last_name, first_name)
@@ -246,6 +248,7 @@ class JournalArticle:
             dois = xpath(reference, 'doi')
             article_titles = xpath(reference, 'article_title')
             author_names = []
+            optionals = dict()
             if dois:
                 doi, = dois
                 doi = get_text(doi)
@@ -256,11 +259,28 @@ class JournalArticle:
                 title = get_text(title)
                 for first_name, last_name in get_author_names(reference):
                     author_names.append((first_name, last_name))
-                suffix = ''
+                suffix = 'TODO: Doplnit!'
+
+                # Optionals
+                def find_optional(input_element_name: str, output_element_name: str) -> None:
+                    elements = xpath(reference, './/{}'.format(input_element_name))
+                    if elements:
+                        element, *_ = elements
+                        optionals[output_element_name] = get_text(element)
+
+                find_optional('jpurnal_title', 'booktitle')
+                find_optional('volume', 'volume')
+                find_optional('issue', 'number')
+                find_optional('cYear', 'year')
+                find_optional('series_title', 'series')
+                find_optional('edition_number', 'edition')
+                find_optional('isbn', 'ISBN')
+                find_optional('issn', 'ISSN')
+                find_optional('url', 'URL')
             else:
                 message = 'Reference {} contains neither DOI nor article title'
                 raise ValueError(message.format(refid))
-            reference = (refid, prefix, title, author_names, suffix)
+            reference = (refid, prefix, title, author_names, suffix, optionals)
             self.references.append(reference)
 
     def _load_keywords(self, journal_article: etree._Element):
@@ -334,7 +354,7 @@ def invert_language(language_code: str) -> str:
     if language_code in ('cze', 'slo'):
         inverted_language = 'eng'
     else:
-        inverted_language = 'cze or slo, please choose the correct one'
+        inverted_language = 'TODO: cze nebo slo, který z nich to je?'
     return inverted_language
 
 
