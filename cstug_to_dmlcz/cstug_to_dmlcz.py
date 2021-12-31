@@ -1,5 +1,5 @@
 from typing import Iterable
-from itertools import chain, repeat
+from itertools import chain
 from pathlib import Path
 import re
 
@@ -45,8 +45,11 @@ class JournalIssue:
         doi = '{}/{}-{}'.format(doi_base, year, issue)
 
         articles = xpath(journal, 'article')
-        articles = map(JournalArticle, zip(articles, repeat(doi)))
-        articles = list(articles)
+        articles = [
+            JournalArticle(article, doi)
+            for article
+            in articles
+        ]
         self.articles = articles
         assert self.articles
 
