@@ -242,18 +242,18 @@ class JournalArticle:
     def _load_references(self, journal_article: etree._Element):
         self.references = list()
         references = xpath(journal_article, 'citation_list/citation')
-        unstructured_citations = xpath(reference, 'crossref:unstructured_citation')
         for refid, reference in enumerate(references):
             refid += 1
             prefix = '[{}]'.format(refid)
             dois = xpath(reference, 'doi')
             article_titles = xpath(reference, 'article_title')
+            unstructured_citations = xpath(reference, 'unstructured_citation')
             author_names = []
             optionals = dict()
             if dois:
                 doi, = dois
                 doi = get_text(doi)
-                title = None
+                title = 'TODO: Doplnit!'
                 suffix = '. DOI: {}'.format(doi)
             elif article_titles:
                 title, = article_titles
@@ -281,7 +281,6 @@ class JournalArticle:
             elif unstructured_citations:
                 unstructured_citation, = unstructured_citations
                 title = None
-                author = None
                 suffix = get_text(unstructured_citation)
             else:
                 message = 'Reference {} contains neither DOI, article title, nor unstructured citation'
