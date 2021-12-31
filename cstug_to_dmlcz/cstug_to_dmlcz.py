@@ -87,8 +87,8 @@ class JournalArticle:
         self._load_doi(journal_article, doi_base)
         self._load_category()
         self._load_references(journal_article)
-        self._load_summaries()
-        self._load_keywords()
+        self._load_summaries(journal_article)
+        self._load_keywords(journal_article)
 
     def write_xml(self, output_dir: Path):
         self._write_meta_xml(output_dir)
