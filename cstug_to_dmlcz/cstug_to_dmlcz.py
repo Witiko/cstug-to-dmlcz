@@ -347,7 +347,7 @@ def normalize_language(language_code: str) -> str:
 
 
 def invert_language(language_code: str) -> str:
-    language_code = normalize_language(language_code)
+    assert language_code in ('cze', 'slo', 'eng')
     if language_code in ('cze', 'slo'):
         inverted_language = 'eng'
     else:
