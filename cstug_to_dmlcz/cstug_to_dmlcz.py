@@ -140,7 +140,7 @@ class JournalArticle:
         document = etree.ElementTree(references)
 
         for refid, prefix, title, author_names, suffix in self.references:
-            reference = etree.SubElement(references, 'reference', id=refid)
+            reference = etree.SubElement(references, 'reference', id=str(refid))
             etree.SubElement(reference, 'prefix').text = prefix
             etree.SubElement(reference, 'title').text = title
             authors = etree.SubElement(reference, 'authors')
