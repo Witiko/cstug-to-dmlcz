@@ -294,9 +294,9 @@ class JournalArticle:
                 continue
 
             if abstract.getprevious().tag is None:
-                keywords_language = self.language
+                keyword_language = self.language
             else:
-                keywords_language = invert_language(self.language)
+                keyword_language = invert_language(self.language)
 
             for keyword_text in keyword_texts:
                 keyword = (keyword_language, keyword_text)
