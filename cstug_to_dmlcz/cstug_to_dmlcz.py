@@ -242,6 +242,7 @@ class JournalArticle:
     def _load_references(self, journal_article: etree._Element):
         self.references = list()
         references = xpath(journal_article, 'citation_list/citation')
+        unstructured_citations = xpath(reference, 'crossref:unstructured_citation')
         for refid, reference in enumerate(references):
             refid += 1
             prefix = '[{}]'.format(refid)
@@ -277,8 +278,13 @@ class JournalArticle:
                 find_optional('isbn', 'ISBN')
                 find_optional('issn', 'ISSN')
                 find_optional('url', 'URL')
+            elif unstructured_citations:
+                unstructured_citation, = unstructured_citations
+                title = None
+                author = None
+                suffix = get_text(unstructured_citation)
             else:
-                message = 'Reference {} contains neither DOI nor article title'
+                message = 'Reference {} contains neither DOI, article title, nor unstructured citation'
                 raise ValueError(message.format(refid))
             reference = (refid, prefix, title, author_names, suffix, optionals)
             self.references.append(reference)
