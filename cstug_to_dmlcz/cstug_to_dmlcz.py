@@ -257,7 +257,7 @@ class JournalArticle:
                 doi = get_text(doi)
                 title = 'TODO: Doplnit!'
                 optionals['URL'] = 'https://dx.doi.org/{}'.format(doi)
-                suffix = '. DOI: {}'.format(doi)
+                suffix = '. TODO: Doplnit!'
 
                 resolved_doi = resolve_doi(doi)
 
@@ -272,13 +272,18 @@ class JournalArticle:
                 def find_optional_in_json(input_address: Iterable[str], output_element_name: str) -> None:
                     element = resolved_doi
                     for fragment in input_address:
-                        if not isinstance(element, dict) or fragment not in element:
+                        if not isinstance(element, (dict, list)):
+                            break
+                        if isinstance(element, dict) and fragment not in element:
+                            break
+                        if isinstance(element, list) and fragment >= len(element):
                             break
                         element = element[fragment]
-                    optionals[output_element_name] = element
+                    assert not isinstance(element, (dict, list))
+                    optionals[output_element_name] = str(element)
 
                 find_optional_in_json(['publisher'], 'publisher')
-                find_optional_in_json(['published-print', 'date-parts', 0], 'year')
+                find_optional_in_json(['published-print', 'date-parts', 0, 0], 'year')
                 find_optional_in_json(['issue'], 'number')
                 find_optional_in_json(['volume'], 'volume')
                 find_optional_in_json(['page'], 'pages')
@@ -289,7 +294,7 @@ class JournalArticle:
                 title = get_text(title)
                 for first_name, last_name in get_author_names(reference):
                     author_names.append((first_name, last_name))
-                suffix = 'TODO: Doplnit!'
+                suffix = '. TODO: Doplnit!'
 
                 def find_optional_in_xml(input_element_name: str, output_element_name: str) -> None:
                     elements = xpath(reference, './/{}'.format(input_element_name))
