@@ -33,7 +33,7 @@ ELEMENT_REPLACEMENTS = {
 
 
 class JournalIssue:
-    def __init__(self, input_xml: Path, input_pdf: Path, page_offset: int, first_page_number: int):
+    def __init__(self, input_xml: Path, input_pdf: Path, page_offset: int):
         self.input_pdf = input_pdf
         self.page_offset = page_offset
 
@@ -47,8 +47,8 @@ class JournalIssue:
         articles = xpath(journal, 'article')
         articles = map(JournalArticle, zip(articles, repeat(doi)))
         articles = list(articles)
-        assert articles
         self.articles = articles
+        assert self.articles
 
     @property
     def first_page_number(self):
