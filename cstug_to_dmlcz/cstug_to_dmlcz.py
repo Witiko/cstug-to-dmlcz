@@ -1,6 +1,7 @@
 from typing import Iterable
 from itertools import chain
 from pathlib import Path
+import subprocess
 import re
 
 import click
@@ -372,10 +373,13 @@ def xpath(element: etree._Element, expression: str) -> Iterable[etree._Element]:
 
 
 def read_xml(filename: Path) -> etree._Element:
-    tree = etree.parse(str(filename))
-    tree.xinclude()
-    root = tree.getroot()
-    if root.tag != '{{{}}}doi_batch'.format(NAMESPACES['crossref']):
+    process = subprocess.Popen(
+        ['xmllint', '--xinclude', str(filename)],
+        stdout=subprocess.PIPE,
+    )
+    stdout, *_ = process.communicate()
+    root = etree.fromstring(stdout)
+    if root.tag != 'bulletin':
         raise ValueError('Unexpected root element {}'.format(root.tag))
     return root
 
