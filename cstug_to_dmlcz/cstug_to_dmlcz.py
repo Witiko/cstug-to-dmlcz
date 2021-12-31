@@ -296,7 +296,7 @@ class JournalArticle:
             if not keyword_texts:
                 continue
 
-            if abstract.getprevious().tag is None:
+            if abstract.getprevious() is None:
                 keyword_language = self.language
             else:
                 keyword_language = invert_language(self.language)
@@ -316,7 +316,7 @@ class JournalArticle:
             if not paragraphs:
                 continue
 
-            if abstract.getprevious().tag is None:
+            if abstract.getprevious() is None:
                 summary_language = self.language
                 self.main_summary_language = summary_language
             else:
