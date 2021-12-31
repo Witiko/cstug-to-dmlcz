@@ -212,16 +212,10 @@ class JournalArticle:
         self.titles = sorted(self.titles)
 
     def _load_authors(self, journal_article: etree._Element):
-        self.authors = list()
-        authors = xpath(journal_article, 'contributors/person_name[@sequence = "first"]')
-        authors = chain(authors, xpath(journal_article, 'contributors/person_name[@sequence = "additional"]'))
-        authors = (author for author in authors if author.attrib['contributor_role'] == 'author')
-        for author_order, author in enumerate(authors):
+        self.authors = []
+        for author_order, (first_name, last_name) in enumerate(get_author_names(reference)):
+            assert first_name
             author_order += 1
-            first_name, = xpath(author, 'given_name')
-            first_name = get_text(first_name)
-            last_name, = xpath(author, 'surname')
-            last_name = get_text(last_name)
             name = (last_name, first_name)
             self.authors.append((author_order, *name))
 
@@ -260,19 +254,7 @@ class JournalArticle:
             elif article_titles:
                 title, = article_titles
                 title = get_text(title)
-                authors = xpath(reference, 'contributors/person_name[@sequence = "first"]')
-                authors = chain(authors, xpath(reference, 'contributors/person_name[@sequence = "additional"]'))
-                authors = (author for author in authors if author.attrib['contributor_role'] == 'author')
-                for author in authors:
-                    first_names = xpath(author, 'given_name')
-                    if first_names:
-                        first_name, = first_names
-                        first_name = get_text(first_name)
-                    else:
-                        first_name = None
-                    last_names = xpath(author, 'surname')
-                    last_name, = last_names
-                    last_name = get_text(last_name)
+                for first_name, last_name in get_author_names(reference):
                     author_names.append((first_name, last_name))
                 suffix = ''
             else:
@@ -367,6 +349,30 @@ def replace_elements_with_text(element: etree._Element, element_name: str, repla
             else:
                 parent.text = '{}{}'.format(parent.text or '', text)
             parent.remove(subelement)
+
+
+def get_author_names(element: etree._Element) -> Iterable[Tuple[str, str]]:
+    authors = chain(
+        xpath(
+            element,
+            'contributors/person_name[@sequence = "first" and @contributor_role = "author"]',
+        ),
+        xpath(
+            element,
+            'contributors/person_name[@sequence = "additional" and @contributor_role = "author"]',
+        ),
+    )
+    for author in authors:
+        first_names = xpath(author, 'given_name')
+        if first_names:
+            first_name, = first_names
+            first_name = get_text(first_name)
+        else:
+            first_name = None
+        last_names = xpath(author, 'surname')
+        last_name, = last_names
+        last_name = get_text(last_name)
+        yield (first_name, last_name)
 
 
 def get_text(element: etree._Element) -> str:
