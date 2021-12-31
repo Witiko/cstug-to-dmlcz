@@ -1,5 +1,6 @@
-from typing import Iterable, Tuple, Optional
+from typing import Iterable, Tuple, Optional, Dict
 from itertools import chain
+import json
 from pathlib import Path
 import subprocess
 import re
@@ -8,6 +9,7 @@ import click
 from lxml import etree
 from PyPDF2 import PdfFileReader, PdfFileWriter
 import pycountry
+import requests
 
 
 NAMESPACES = dict()
@@ -254,7 +256,34 @@ class JournalArticle:
                 doi, = dois
                 doi = get_text(doi)
                 title = 'TODO: Doplnit!'
+                optionals['URL'] = 'https://dx.doi.org/{}'.format(doi)
                 suffix = '. DOI: {}'.format(doi)
+
+                resolved_doi = resolve_doi(doi)
+
+                if 'title' in resolved_doi:
+                    title = resolved_doi['title']
+
+                if 'author' in resolved_doi and resolved_doi['author']:
+                    first_name = resolved_doi['author'][0]['given']
+                    last_name = resolved_doi['author'][0]['family']
+                    author_names.append((first_name, last_name))
+
+                def find_optional_in_json(input_address: Iterable[str], output_element_name: str) -> None:
+                    element = resolved_doi
+                    for fragment in input_address:
+                        if not isinstance(element, dict) or fragment not in element:
+                            break
+                        element = element[fragment]
+                    optionals[output_element_name] = element
+
+                find_optional_in_json(['publisher'], 'publisher')
+                find_optional_in_json(['published-print', 'date-parts', 0], 'year')
+                find_optional_in_json(['issue'], 'number')
+                find_optional_in_json(['volume'], 'volume')
+                find_optional_in_json(['page'], 'pages')
+                find_optional_in_json(['ISSN', 0], 'ISSN')
+
             elif article_titles:
                 title, = article_titles
                 title = get_text(title)
@@ -262,25 +291,24 @@ class JournalArticle:
                     author_names.append((first_name, last_name))
                 suffix = 'TODO: Doplnit!'
 
-                # Optionals
-                def find_optional(input_element_name: str, output_element_name: str) -> None:
+                def find_optional_in_xml(input_element_name: str, output_element_name: str) -> None:
                     elements = xpath(reference, './/{}'.format(input_element_name))
                     if elements:
                         element, *_ = elements
                         optionals[output_element_name] = get_text(element)
 
-                find_optional('jpurnal_title', 'booktitle')
-                find_optional('volume', 'volume')
-                find_optional('issue', 'number')
-                find_optional('cYear', 'year')
-                find_optional('series_title', 'series')
-                find_optional('edition_number', 'edition')
-                find_optional('isbn', 'ISBN')
-                find_optional('issn', 'ISSN')
-                find_optional('url', 'URL')
+                find_optional_in_xml('jpurnal_title', 'booktitle')
+                find_optional_in_xml('volume', 'volume')
+                find_optional_in_xml('issue', 'number')
+                find_optional_in_xml('cYear', 'year')
+                find_optional_in_xml('series_title', 'series')
+                find_optional_in_xml('edition_number', 'edition')
+                find_optional_in_xml('isbn', 'ISBN')
+                find_optional_in_xml('issn', 'ISSN')
+                find_optional_in_xml('url', 'URL')
             elif unstructured_citations:
                 unstructured_citation, = unstructured_citations
-                title = None
+                title = 'TODO: Doplnit!'
                 suffix = get_text(unstructured_citation)
             else:
                 message = 'Reference {} contains neither DOI, article title, nor unstructured citation'
@@ -409,6 +437,16 @@ def get_text(element: etree._Element) -> str:
     texts = filter(lambda x: x, texts)
     texts = ' '.join(texts).split()
     return ' '.join(texts)
+
+
+def resolve_doi(doi: str) -> Dict:
+    url = 'https://dx.doi.org/{}'.format(doi)
+    headers = {'Accept': 'application/vnd.citationstyles.csl+json'}
+    result = requests.get(url, headers=headers)
+    if result.status_code == 200:
+        return json.loads(result.text)
+    else:
+        return dict()
 
 
 def xpath(element: etree._Element, expression: str) -> Iterable[etree._Element]:

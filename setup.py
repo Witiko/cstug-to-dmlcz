@@ -25,6 +25,7 @@ setup(
         'click~=7.1.2',
         'PyPDF2~=1.26.0',
         'pycountry~=20.7.3',
+        'requests~=2.26.0',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
