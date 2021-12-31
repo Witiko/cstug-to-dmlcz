@@ -356,11 +356,23 @@ def invert_language(language_code: str) -> str:
     return inverted_language
 
 
+def replace_elements_with_text(element: etree._Element, element_name: str, replacement_text: str) -> None:
+    for subelement in element.xpath('//{}'.format(element_name)):
+        text = '{}{}'.format(replacement_text, subelement.tail or '')
+        parent = subelement.getparent()
+        if parent is not None:
+            previous = subelement.getprevious()
+            if previous is not None:
+                previous.tail = '{}{}'.format(previous.tail or '', text)
+            else:
+                parent.text = '{}{}'.format(parent.text or '', text)
+            parent.remove(subelement)
+
+
 def get_text(element: etree._Element) -> str:
     element = etree.fromstring(etree.tostring(element))
     for replacement_element_name, replacement_text in ELEMENT_REPLACEMENTS.items():
-        for replacement_element in xpath(element, replacement_element_name):
-            replacement_element.text = replacement_text
+        replace_elements_with_text(element, replacement_element_name, replacement_text)
     texts = xpath(element, './/text()')
     texts = map(str.strip, texts)
     texts = filter(lambda x: x, texts)
