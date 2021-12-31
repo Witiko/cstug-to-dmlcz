@@ -348,7 +348,7 @@ def invert_language(language_code: str) -> str:
     if language_code in ('cze', 'slo'):
         inverted_language = 'eng'
     else:
-        inverted_language 'cze or slo, please choose the correct one'
+        inverted_language = 'cze or slo, please choose the correct one'
     return inverted_language
 
 
