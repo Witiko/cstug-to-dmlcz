@@ -1,4 +1,4 @@
-from typing import Iterable, Tuple
+from typing import Iterable, Tuple, Optional
 from itertools import chain
 from pathlib import Path
 import subprocess
@@ -371,7 +371,7 @@ def replace_elements_with_text(element: etree._Element, element_name: str, repla
             parent.remove(subelement)
 
 
-def get_author_names(element: etree._Element) -> Iterable[Tuple[str, str]]:
+def get_author_names(element: etree._Element) -> Iterable[Tuple[Optional[str], str]]:
     authors = chain(
         xpath(
             element,
