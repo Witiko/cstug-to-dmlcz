@@ -279,7 +279,8 @@ class JournalArticle:
                         if isinstance(element, list) and fragment >= len(element):
                             break
                         element = element[fragment]
-                    assert not isinstance(element, (dict, list))
+                    if isinstance(element, (dict, list)):
+                        return
                     optionals[output_element_name] = str(element)
 
                 find_optional_in_json(['publisher'], 'publisher')
