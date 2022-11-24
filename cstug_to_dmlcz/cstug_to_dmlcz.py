@@ -257,7 +257,7 @@ class JournalArticle:
                 doi = get_text(doi)
                 title = 'TODO: Doplnit!'
                 optionals['URL'] = 'https://dx.doi.org/{}'.format(doi)
-                suffix = '. TODO: Doplnit!'
+                suffix = 'TODO: Doplnit!'
 
                 resolved_doi = resolve_doi(doi)
 
@@ -295,7 +295,7 @@ class JournalArticle:
                 title = get_text(title)
                 for first_name, last_name in get_author_names(reference):
                     author_names.append((first_name, last_name))
-                suffix = '. TODO: Doplnit!'
+                suffix = 'TODO: Doplnit!'
 
                 def find_optional_in_xml(input_element_name: str, output_element_name: str) -> None:
                     elements = xpath(reference, './/{}'.format(input_element_name))
