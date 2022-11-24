@@ -303,7 +303,7 @@ class JournalArticle:
                         element, *_ = elements
                         optionals[output_element_name] = get_text(element)
 
-                find_optional_in_xml('jpurnal_title', 'booktitle')
+                find_optional_in_xml('journal_title', 'booktitle')
                 find_optional_in_xml('volume', 'volume')
                 find_optional_in_xml('issue', 'number')
                 find_optional_in_xml('cYear', 'year')
