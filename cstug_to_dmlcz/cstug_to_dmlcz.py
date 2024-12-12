@@ -265,9 +265,16 @@ class JournalArticle:
                     title = resolved_doi['title']
 
                 if 'author' in resolved_doi and resolved_doi['author']:
-                    first_name = resolved_doi['author'][0]['given']
-                    last_name = resolved_doi['author'][0]['family']
-                    author_names.append((first_name, last_name))
+                    if 'given' in resolved_doi['author'][0] and 'family' in resolved_doi['author'][0]:
+                        first_name = resolved_doi['author'][0]['given']
+                        last_name = resolved_doi['author'][0]['family']
+                        author_names.append((first_name, last_name))
+                    elif 'name' in resolved_doi['author'][0]:
+                        name = resolved_doi['author'][0]['name']
+                        author_names.append((None, name))
+                    else:
+                        assert False, resolved_doi['author'][0]
+
 
                 def find_optional_in_json(input_address: Iterable[str], output_element_name: str) -> None:
                     element = resolved_doi
