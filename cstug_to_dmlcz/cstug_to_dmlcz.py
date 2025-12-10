@@ -272,6 +272,9 @@ class JournalArticle:
                     elif 'name' in resolved_doi['author'][0]:
                         name = resolved_doi['author'][0]['name']
                         author_names.append((None, name))
+                    elif 'family' in resolved_doi['author'][0]:
+                        name = resolved_doi['author'][0]['family']
+                        author_names.append((None, name))
                     else:
                         assert False, resolved_doi['author'][0]
 
