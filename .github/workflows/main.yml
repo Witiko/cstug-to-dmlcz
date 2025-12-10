@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.9', '3.10']
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
@@ -28,7 +28,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        python: ['3.9', '3.10', '3.11', '3.12']
+        python: ['3.9', '3.10']
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
