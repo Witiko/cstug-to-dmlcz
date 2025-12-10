@@ -278,7 +278,6 @@ class JournalArticle:
                     else:
                         assert False, resolved_doi['author'][0]
 
-
                 def find_optional_in_json(input_address: Iterable[str], output_element_name: str) -> None:
                     element = resolved_doi
                     for fragment in input_address:
