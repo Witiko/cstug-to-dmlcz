@@ -171,7 +171,7 @@ class JournalArticle:
         write_pdf(output_dir / 'source.pdf', output_pdf)
 
     def _load_titles(self, journal_article: etree._Element):
-        self.titles = set()
+        self.titles = list()
 
         # Main title
         title, = xpath(journal_article, 'titles/title')
@@ -186,7 +186,7 @@ class JournalArticle:
             title_text = '{}: {}'.format(title_text, subtitle_text)
             break
 
-        self.titles.add((title_language, title_text))
+        self.titles.append((title_language, title_text))
 
         # Original language title
         original_titles = xpath(journal_article, 'titles/original_language_title')
@@ -203,7 +203,7 @@ class JournalArticle:
                 original_title_text = '{}: {}'.format(original_title_text, original_subtitle_text)
                 break
 
-            self.titles.add((original_title_language, original_title_text))
+            self.titles.append((original_title_language, original_title_text))
 
         # Additional content title
         additional_titles = xpath(journal_article, 'additional-content/title')
@@ -211,9 +211,7 @@ class JournalArticle:
             additional_title, = additional_titles
             additional_title_text = get_text(additional_title)
             additional_title_language = invert_language(title_language)
-            self.titles.add((additional_title_language, additional_title_text))
-
-        self.titles = sorted(self.titles)
+            self.titles.append((additional_title_language, additional_title_text))
 
     def _load_authors(self, journal_article: etree._Element):
         self.authors = []
