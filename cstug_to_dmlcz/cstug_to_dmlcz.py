@@ -261,7 +261,9 @@ class JournalArticle:
 
                 resolved_doi = resolve_doi(doi)
 
-                if 'title' in resolved_doi:
+                if 'original-title' in resolved_doi and resolved_doi['original-title']:
+                    title = resolved_doi['original-title'][0]
+                elif 'title' in resolved_doi:
                     title = resolved_doi['title']
 
                 if 'author' in resolved_doi and resolved_doi['author']:
